@@ -19,7 +19,13 @@ You can use this tool as a command-line tool.
 - [Node.js >=22](https://nodejs.org/en/download)
 - npm (built-in to Node.js), yarn, or pnpm
 
-On first run, a compatible Chrome build is downloaded automatically if it is not already present (this is required for the headless browser). With a regular `npm install`, Chrome is also fetched during installation. If you use a custom Puppeteer cache directory, set `PUPPETEER_CACHE_DIR` accordingly.
+On first run, the matching Chrome build is downloaded automatically if needed. To install it manually (for example before an offline run):
+
+```sh
+npx miro-export install-browser
+```
+
+**Important:** Do not use bare `npx puppeteer browsers install`. That command uses the latest Puppeteer release and downloads a different Chrome version than miro-export expects, so you will still see “Could not find Chrome” even after a successful install.
 
 ### Installation
 

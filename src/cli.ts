@@ -1,7 +1,18 @@
 import { writeFile } from "fs/promises";
 import { program } from "@commander-js/extra-typings";
+import { ensureBrowserInstalled } from "./ensure-browser.js";
 import { MiroBoard } from "./index.js";
 import type { FrameBoardObject } from "./miro-types.ts";
+
+if (process.argv.includes("install-browser")) {
+  try {
+    await ensureBrowserInstalled({ verbose: true });
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
+    process.exitCode = 1;
+  }
+  process.exit(process.exitCode ?? 0);
+}
 
 const { token, boardId, frameNames, outputFile, exportFormat, loadTimeout } =
   program

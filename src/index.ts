@@ -1,5 +1,9 @@
 import puppeteer, { Browser, Page, type LaunchOptions } from "puppeteer";
-import { ensureBrowserInstalled } from "./ensure-browser.js";
+import {
+  ensureBrowserInstalled,
+  formatChromeInstallHelp,
+  isChromeNotFoundError
+} from "./ensure-browser.js";
 import type { BoardObject } from "./miro-types.ts";
 import type { GetBoardsFilter } from "./miro-runtime.ts";
 
@@ -46,10 +50,20 @@ export class MiroBoard {
   private async initialize(options: InitialMiroBoardOptions) {
     await ensureBrowserInstalled();
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      ...(options.puppeteerOptions ?? {})
-    });
+    let browser;
+    try {
+      browser = await puppeteer.launch({
+        headless: true,
+        ...(options.puppeteerOptions ?? {})
+      });
+    } catch (err) {
+      if (isChromeNotFoundError(err)) {
+        throw new Error(
+          `${formatChromeInstallHelp()}\n\n${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      throw err;
+    }
     const page = await browser.newPage();
 
     if (options.token) {
