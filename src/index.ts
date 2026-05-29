@@ -1,4 +1,5 @@
 import puppeteer, { Browser, Page, type LaunchOptions } from "puppeteer";
+import { ensureBrowserInstalled } from "./ensure-browser.js";
 import type { BoardObject } from "./miro-types.ts";
 import type { GetBoardsFilter } from "./miro-runtime.ts";
 
@@ -43,6 +44,8 @@ export class MiroBoard {
   }
 
   private async initialize(options: InitialMiroBoardOptions) {
+    await ensureBrowserInstalled();
+
     const browser = await puppeteer.launch({
       headless: true,
       ...(options.puppeteerOptions ?? {})

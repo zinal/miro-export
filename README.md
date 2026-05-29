@@ -19,6 +19,8 @@ You can use this tool as a command-line tool.
 - [Node.js >=22](https://nodejs.org/en/download)
 - npm (built-in to Node.js), yarn, or pnpm
 
+On first run, a compatible Chrome build is downloaded automatically if it is not already present (this is required for the headless browser). With a regular `npm install`, Chrome is also fetched during installation. If you use a custom Puppeteer cache directory, set `PUPPETEER_CACHE_DIR` accordingly.
+
 ### Installation
 
 The CLI can be ran using [npx](https://docs.npmjs.com/cli/v8/commands/npx) with `npx miro-export [options]` (see options below). Alternatively, it's possible to install the package to the global scope with, for example, `npm i -g miro-export`.
