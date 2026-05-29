@@ -80,3 +80,67 @@ export async function ensureBrowserInstalled(options?: {
 export function isChromeNotFoundError(err: unknown): boolean {
   return err instanceof Error && err.message.includes("Could not find Chrome");
 }
+
+export function diagnoseBrowser(): {
+  requiredBuildId: string;
+  cacheDirectory: string;
+  executablePath: string;
+  executableExists: boolean;
+  cachedBuildIds: string[];
+  env: { PUPPETEER_CACHE_DIR?: string; HOME?: string };
+} {
+  const { configuration, browserVersion: requiredBuildId } =
+    getPuppeteerRuntime();
+  const cacheDirectory = configuration.cacheDirectory;
+  const executablePath = computeExecutablePath({
+    cacheDir: cacheDirectory,
+    browser: Browser.CHROME,
+    buildId: requiredBuildId
+  });
+
+  return {
+    requiredBuildId,
+    cacheDirectory,
+    executablePath,
+    executableExists: existsSync(executablePath),
+    cachedBuildIds: listCachedChromeBuildIds(cacheDirectory),
+    env: {
+      PUPPETEER_CACHE_DIR: process.env.PUPPETEER_CACHE_DIR,
+      HOME: process.env.HOME
+    }
+  };
+}
+
+export function printBrowserDiagnosis(): void {
+  const d = diagnoseBrowser();
+  console.log("miro-export Chrome diagnostics\n");
+  console.log(`Required Chrome build:  ${d.requiredBuildId}`);
+  console.log(`Puppeteer cache dir:    ${d.cacheDirectory}`);
+  console.log(`Expected executable:    ${d.executablePath}`);
+  console.log(`Executable exists:      ${d.executableExists ? "yes" : "NO"}`);
+  console.log(
+    `Cached Chrome builds:   ${d.cachedBuildIds.length ? d.cachedBuildIds.join(", ") : "(none)"}`
+  );
+  console.log(
+    `PUPPETEER_CACHE_DIR:    ${d.env.PUPPETEER_CACHE_DIR ?? "(not set)"}`
+  );
+  console.log(`HOME:                   ${d.env.HOME ?? "(not set)"}`);
+
+  if (!d.executableExists) {
+    console.log("\nFix:");
+    console.log("  npx miro-export install-browser");
+    console.log("  # or, for npm 1.3.2:");
+    console.log(`  npx -y puppeteer@24.43.1 browsers install chrome`);
+    if (
+      d.cachedBuildIds.length > 0 &&
+      !d.cachedBuildIds.includes(d.requiredBuildId)
+    ) {
+      console.log(
+        `\nNote: You have Chrome ${d.cachedBuildIds.join(", ")} cached, but not ${d.requiredBuildId}.`
+      );
+      console.log(
+        'Bare "npx puppeteer browsers install" installs the latest Chrome, not this version.'
+      );
+    }
+  }
+}

@@ -25,6 +25,12 @@ On first run, the matching Chrome build is downloaded automatically if needed. T
 npx miro-export install-browser
 ```
 
+To debug Chrome/cache issues:
+
+```sh
+npx miro-export doctor
+```
+
 **Important:** Do not use bare `npx puppeteer browsers install`. That command uses the latest Puppeteer release and downloads a different Chrome version than miro-export expects, so you will still see “Could not find Chrome” even after a successful install.
 
 ### Installation

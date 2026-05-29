@@ -4,6 +4,12 @@ import { ensureBrowserInstalled } from "./ensure-browser.js";
 import { MiroBoard } from "./index.js";
 import type { FrameBoardObject } from "./miro-types.ts";
 
+if (process.argv.includes("doctor")) {
+  const { printBrowserDiagnosis } = await import("./ensure-browser.js");
+  printBrowserDiagnosis();
+  process.exit(0);
+}
+
 if (process.argv.includes("install-browser")) {
   try {
     await ensureBrowserInstalled({ verbose: true });
