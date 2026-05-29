@@ -85,6 +85,17 @@ export class MiroBoard {
       waitUntil: "domcontentloaded"
     });
 
+    const pageTitle = await page.title();
+    if (
+      /no longer shared|has been removed|access denied|sign in/i.test(pageTitle)
+    ) {
+      throw new Error(
+        `Miro board is not accessible (page title: "${pageTitle}"). ` +
+          "Open the board in a browser while logged in, confirm the board ID from the URL, " +
+          "and pass a fresh token with -t if the board is not public."
+      );
+    }
+
     try {
       await page.evaluate(
         (timeoutDuration) =>
